@@ -1,9 +1,9 @@
 from typing import Optional
 
 class ListNode:
-    def __init__(self, x):
+    def __init__(self, x, next = None):
         self.val = x
-        self.next = None
+        self.next = next
 
 class MyLinkedList:
     # leetcode 707
@@ -66,25 +66,9 @@ def build_list(nums):
         cur = cur.next
 
     return dummy.next    
-
-def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-    # leetcode 206
-    if head.next is None:
-        return head
-
-    # dummy = ListNode(0)
-    prex = None
-    while head.next is not None:
-        cur = ListNode(head.val)
-        cur.next = prex
-
-        prex = cur
-        head = head.next
-    return prex
      
-
+# 2 题
 def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
-    # Leetcode 2
     dummy = ListNode(0)
     ans = dummy
     bit_carry  = 0
@@ -107,8 +91,93 @@ def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[Li
     
     return dummy.next
 
+# 21 题
+def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+    cur = dummy = ListNode(0)
+
+    ln1 = list1
+    ln2 = list2
+
+    # 一方结束则停止
+    while ln1 and ln2:
+        if ln1.val <= ln2.val:
+            # dummy update
+            dummy.next = ln1
+            dummy = dummy.next  
+
+            # listNode update
+            ln1 = ln1.next 
+        else:
+            dummy.next = ln2
+            dummy = dummy.next
+            ln2 = ln2.next
+
+    # 剪枝,不存在两个listNode同时被取完
+    if ln1:
+        dummy.next = ln1
+    else:
+        dummy.next = ln2
+
+    return cur.next
+
+# 160 题  
+def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+    """
+    解法1
+    
+    tempA = headA
+    tempB = headB
+
+    while tempA != tempB:
+        tempA = tempA.next if tempA else headB
+        tempB = tempB.next if tempB else headA
+
+    return tempA
+    """
+
+    """
+    解法2
+    """
+    # 获取两个listNode的长度
+    def getLen(head:ListNode) -> int:
+        size = 0
+        cur = head
+        while cur:
+            size += 1
+            cur = cur.next
+
+        return size
+
+    lenA = getLen(head=headA)
+    lenB = getLen(head=headB)
+
+    # 差值
+    diff = lenA - lenB
+
+    # 基于差值重新构造listNode 
+    if diff >=0:
+        # lenA 先走
+        while diff >0:
+            headA = headA.next
+            diff -=1
+
+    elif diff < 0:
+        # len B 先走
+        while diff <0:
+            headB = headB.next
+            diff +=1
+
+    # 双指针同时遍历
+    tempA = headA
+    tempB = headB
+    while tempA != tempB:
+        tempA = tempA.next
+        tempB = tempB.next
+
+    return tempA
+
+# leetcode 203
 def removeElements(head: Optional[ListNode], val: int) -> Optional[ListNode]: 
-    # leetcode 203
     dummy = ListNode(0)
     ans = dummy
 
@@ -123,9 +192,135 @@ def removeElements(head: Optional[ListNode], val: int) -> Optional[ListNode]:
             ans.next = None
     return dummy.next
 
+# 206 题
+def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        cur = head
+
+        while cur:
+            # 1. 保存下一个节点
+            cur_next = cur.next
+
+            # 2. 修改当前节点 next
+            cur.next = prev
+
+            # 3. prev 前进
+            prev = cur
+
+            # 4. cur 前进
+            cur = cur_next
+
+        return prev
+
+def removeNthFromEnd(head: Optional[ListNode], n: int):
+    # 快慢指针
+    dummy = ListNode(0,next=head)
+    fast = dummy
+    slow = dummy
+
+    # 快n个步伐
+    for _ in range(n+1):
+        fast = fast.next
+
+    # 同时出发
+    while fast:
+        fast = fast.next
+        slow = slow.next
+    
+    # 移除slow.next
+    slow.next = slow.next.next
+
+    return dummy.next
+
+def detectCycle(head: Optional[ListNode]) -> Optional[ListNode]:
+    slow = head    # 移动一格
+    fast = head    # 移动两格
+
+    while fast and fast.next:
+        fast = fast.next.next
+        slow = slow.next
+
+        # 有环
+        if fast == slow:
+            # 详情数学推理，结果为从slow走到剩余环的距离 == 从头开始走到环入口的距离
+            p1 = head
+            p2 = slow
+            while p1 != p2:
+                p1 = p1.next
+                p2 = p2.next
+            return p1
+    return None
+
+def addTwoNumbers_2(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    dummy = ListNode(0)
+    cur = dummy
+    bit = 0  # 进位
+
+    while l1 or l2:
+        # 判断是否有节点
+        x = l1.val if l1 else 0
+        y = l2.val if l2 else 0
+
+        # 三者求和
+        sum_ = x + y + bit
+
+        # bit 更新
+        bit = sum_ // 10
+        # 节点gengxin
+        cur.next = ListNode(sum_ % 10)
+        cur= cur.next
+
+        # 更新listNodes
+        l1 = l1.next
+        l2 = l2.next
+
+    return dummy.next
+
+
+    
+
+        
+
+# 232 题
+class MyQueue:
+    def __init__(self):
+        self.stack_in = []   # push 
+        self.stack_out = []     # pop/peek
+
+    def push(self, x: int) -> None:
+        self.stack_in.append(x)
+        return 
+        
+    def pop(self) -> int:
+        # 先判断stack_out 内部是否有element
+        if self.stack_out:
+            return self.stack_out.pop()
+
+        # stack_in 倒进 stack_out
+        while len(self.stack_in) >0:
+            obj = self.stack_in.pop()
+            self.stack_out.append(obj)
+                
+        return self.stack_out.pop()
+
+    def peek(self) -> int:
+        # 先判断stack_out 内部是否有element
+        if self.stack_out:
+            return self.stack_out[-1]
+        
+        while len(self.stack_in)>0:
+            obj = self.stack_in.pop()
+            self.stack_out.append(obj)
+        
+        return self.stack_out[-1]
+
+    def empty(self) -> bool:
+        if self.stack_in or self.stack_out:
+            return False
+        return True
 
         
 if __name__ == "__main__":
     head = build_list([1,2,6,3,4,5,6])
-    print(removeElements(head, 6))
+    print(removeNthFromEnd(head, 2))
 
