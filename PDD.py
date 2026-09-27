@@ -233,40 +233,44 @@ def q3_20260816():
     print(dp[-1])
 
 def q2_20250914():
-    max_day, max_order, perday = map(int, input().split())
-    price = list(map(int, input().split()))
-    deadline = list(map(int, input().split()))
+    day, order_num, max_day = map(int,input().split())
+    prices = list(map(int,input().split()))
+    deadlines = list(map(int,input().split()))
 
-    deadline.sort() # 从小到达
-    heap_price = []    # 控制最小值
+    deadlines.sort()    # 排序，早的先卖
+    heap = []       # 最小堆    （price，day，remain）
 
-    cost = 0    # total cost
-    added_day = 0
-    day_capacity  = [perday]* max_day   # 用于判断哪天是否达到上限 
+    # 全局变量
+    cur_day  = 1      # 记录当前天
+    total_cost = 0
 
-    for closest in deadline:
-        # 加入所有小于的day
-        while added_day < closest:
+    for d in deadlines:
+        # 插入heap
+        while cur_day <= day and cur_day<=d:
             heapq.heappush(
-                heap_price,
-                (price[added_day], added_day)
+                heap,
+                (prices[cur_day], cur_day, max_day)
             )
+            cur_day += 1
 
-            added_day += 1
+        # body
+        if not heap:    # heap 空了
+            print(-1)
+        else:
+            # 弹出今日信息
+            price, cur_day, remain = heapq.heappop(heap)
 
-        # 弹出
-        delivery_cost, delivery_day = heapq.heappop(heap_price)
+            # 更新
+            total_cost += price
+            remain -= 1
 
-        day_capacity[delivery_day] -=1
-        cost += delivery_cost
-
-        if day_capacity[delivery_day] >0:
-            heapq.heappush(
-                heap_price,
-                (delivery_cost, delivery_day)
-            )
-
-    print(cost)
+            if remain >0:
+                # 仍有继续售出
+                heapq.heappush(
+                    heap,
+                    (prices[cur_day], cur_day, remain)
+                )
+    print(total_cost)
 
 def q4_20260816():
     node, edge = map(int,input().split())
